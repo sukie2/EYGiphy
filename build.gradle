@@ -1,5 +1,6 @@
 buildscript {
     ext {
+        fragment_version = "1.5.5"
         hilt_version = "2.44"
         coroutine_version = "1.6.0"
         room_version = "2.4.3"

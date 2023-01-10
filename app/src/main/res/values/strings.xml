@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">EYGiphy</string>
+    <string name="app_name">Giphy Rush</string>
+    <string-array name="tab_array">
+        <item>All</item>
+        <item>Favourites</item>
+    </string-array>
 </resources>
