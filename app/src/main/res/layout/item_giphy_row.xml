@@ -3,30 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".presentation.MainActivity">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search_bar"
+    <TextView
+        android:id="@+id/titleText"
         android:layout_width="0dp"
+        tools:text="@string/find_giphy"
+        android:textAlignment="center"
+        android:textSize="16sp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_12"
         app:layout_constraintEnd_toEndOf="parent"
-        app:iconifiedByDefault="false"
-        app:queryHint="@string/find_giphy"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/giphyRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_12"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_bar"
-        tools:listitem="@layout/item_giphy_row" />
+        app:layout_constraintEnd_toEndOf="@+id/titleText"
+        app:layout_constraintStart_toStartOf="@+id/titleText"
+        app:layout_constraintTop_toBottomOf="@+id/titleText" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

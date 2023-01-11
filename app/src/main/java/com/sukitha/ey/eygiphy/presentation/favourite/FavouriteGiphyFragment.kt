@@ -4,15 +4,15 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.sukitha.ey.eygiphy.R
-import com.sukitha.ey.eygiphy.databinding.FragmentAllGiphyBinding
+import com.sukitha.ey.eygiphy.databinding.FragmentFavouriteGiphyBinding
 
 class FavouriteGiphyFragment : Fragment(R.layout.fragment_favourite_giphy) {
 
-    private var binding: FragmentAllGiphyBinding? = null
+    private var binding: FragmentFavouriteGiphyBinding? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentAllGiphyBinding.bind(view)
+        binding = FragmentFavouriteGiphyBinding.bind(view)
     }
 
     override fun onDestroyView() {
