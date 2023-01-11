@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.sukitha.ey.eygiphy.R
-import com.sukitha.ey.eygiphy.presentation.domain.data.Giphy
+import com.sukitha.ey.eygiphy.domain.data.Giphy
 
 class AllGiphyListAdapter(val data: List<Giphy>, val onClick: (Giphy) -> Unit) :
     RecyclerView.Adapter<AllGiphyListAdapter.GiphyViewHolder>() {
@@ -21,7 +21,8 @@ class AllGiphyListAdapter(val data: List<Giphy>, val onClick: (Giphy) -> Unit) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GiphyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_giphy_row, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.item_giphy_row, parent, false)
         return GiphyViewHolder(view)
     }
 
@@ -32,9 +33,12 @@ class AllGiphyListAdapter(val data: List<Giphy>, val onClick: (Giphy) -> Unit) :
         }
         Glide.with(holder.imageView.context)
             .asGif()
-            .load("https://media3.giphy.com/media/b9w56508q1nZxznfnV/giphy-downsized.gif?cid=881c11e6u3f8zl1tjmidij95dr0tgmyts1lvauly47rw2i3c&rid=giphy-downsized.gif&ct=g")
+            .load(data[position].url)
+            .placeholder(R.drawable.ic_baseline_gif_24)
+            .override(250, 250)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
-            .into(holder.imageView);
+            .into(holder.imageView)
     }
 
     override fun getItemCount(): Int {
