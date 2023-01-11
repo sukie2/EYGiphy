@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface GiphyRemoteRepository {
     fun getTrendingGiphy(): Flow<ApiResult<List<Giphy>>>
-    fun getGiphy(query: String): Flow<List<Giphy>>
+    fun getGiphy(query: String): Flow<ApiResult<List<Giphy>>>
 }

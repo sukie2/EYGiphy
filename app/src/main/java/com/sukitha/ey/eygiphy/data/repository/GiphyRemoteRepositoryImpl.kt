@@ -23,9 +23,17 @@ class GiphyRemoteRepositoryImpl(private val api: GiphyApi) : GiphyRemoteReposito
         }
     }
 
-    override fun getGiphy(query: String): Flow<List<Giphy>> {
-        return flow {
-//            emit(api.getGiphy(query))
+    override fun getGiphy(query: String): Flow<ApiResult<List<Giphy>>> {
+        return try {
+            flow {
+                emit(ApiResult.Success(
+                    data = api.getGiphy(query = query).body()?.toDomain()
+                ))
+            }
+        } catch (e: Exception) {
+            flow {
+                emit(ApiResult.Error(message = e.localizedMessage))
+            }
         }
     }
 }

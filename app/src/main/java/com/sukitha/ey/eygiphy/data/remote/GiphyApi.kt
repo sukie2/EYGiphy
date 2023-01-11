@@ -13,9 +13,16 @@ interface GiphyApi {
         @Query(
             "api_key"
         ) apiKey: String = BuildConfig.API_KEY,
-        @Query("limit") pageSize: Int = 100,
+        @Query("limit") pageSize: Int = 50,
         @Query("rating") rating: String = "g",
     ): Response<GiphyResponse>
 
-    fun getGiphy(query: String): List<GiphyDto>
+    @GET("search?lang=en&offset=0&rating=g")
+    suspend fun getGiphy(
+        @Query(
+            "api_key"
+        ) apiKey: String = BuildConfig.API_KEY,
+        @Query("limit") pageSize: Int = 50,
+        @Query("q") query: String = "",
+    ): Response<GiphyResponse>
 }

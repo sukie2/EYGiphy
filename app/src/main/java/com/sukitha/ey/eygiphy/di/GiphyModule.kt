@@ -1,8 +1,8 @@
 package com.sukitha.ey.eygiphy.di
 
 import com.sukitha.ey.eygiphy.domain.repository.GiphyRemoteRepository
-import com.sukitha.ey.eygiphy.domain.usecase.GetGiphy
-import com.sukitha.ey.eygiphy.domain.usecase.GetTrendingGiphy
+import com.sukitha.ey.eygiphy.domain.usecase.GetGiphyUseCase
+import com.sukitha.ey.eygiphy.domain.usecase.GetTrendingGiphyUseCase
 import com.sukitha.ey.eygiphy.domain.usecase.GiphyUseCases
 import com.sukitha.ey.eygiphy.data.remote.GiphyApi
 import com.sukitha.ey.eygiphy.data.repository.GiphyRemoteRepositoryImpl
@@ -21,8 +21,8 @@ object GiphyModule {
     @Provides
     fun providesGiphyUseCase(giphyRemoteRepository: GiphyRemoteRepository): GiphyUseCases {
         return GiphyUseCases(
-            getGiphy = GetGiphy(giphyRemoteRepository),
-            getTrendingGiphy = GetTrendingGiphy(giphyRemoteRepository)
+            getGiphyUseCase = GetGiphyUseCase(giphyRemoteRepository),
+            getTrendingGiphyUseCase = GetTrendingGiphyUseCase(giphyRemoteRepository)
         )
     }
 }
