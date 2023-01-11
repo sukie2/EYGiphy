@@ -5,6 +5,7 @@ import android.view.View
 
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -14,14 +15,16 @@ import com.sukitha.ey.eygiphy.R
 import com.sukitha.ey.eygiphy.databinding.FragmentAllGiphyBinding
 import com.sukitha.ey.eygiphy.domain.data.Giphy
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 @AndroidEntryPoint
 class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
 
     private var binding: FragmentAllGiphyBinding? = null
     private val viewModel by viewModels<AllGiphyViewModel>()
+    private val giphy = mutableListOf<Giphy>()
+    private lateinit var adapter: AllGiphyListAdapter
+    private val emptyListIndicator = MutableStateFlow<Boolean>(false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -29,13 +32,42 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
 
         setupSearchView()
         setupRecyclerView()
+        observeState()
 
         viewModel.fetchTrendingGiphy()
     }
 
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.giphyList
+                .onEach { newGiphy ->
+                    giphy.clear()
+                    giphy.addAll(newGiphy)
+                    adapter.notifyDataSetChanged()
+                    emptyListIndicator.value = newGiphy.isEmpty()
+                }.launchIn(this)
+
+            viewModel.isLoading.onEach {
+                binding?.progressBar?.isVisible = it
+            }.launchIn(this)
+
+            emptyListIndicator.onEach {
+                binding?.emptyMessageTextView?.isVisible = it
+            }.launchIn(this)
+
+            viewModel.showError.onEach {
+                var message = it
+                if(message.isNullOrBlank()) {
+                    message = getString(R.string.generic_error_message)
+                }
+                Toast.makeText(activity, message, Toast.LENGTH_LONG)
+                    .show()
+            }.launchIn(this)
+        }
+    }
+
     private fun setupRecyclerView() {
-        val giphy = mutableListOf<Giphy>()
-        val adapter = AllGiphyListAdapter(giphy) {
+        adapter = AllGiphyListAdapter(giphy) {
             onFavouritesIconClick(it)
         }
         binding?.giphyRecyclerView?.adapter = adapter
@@ -47,15 +79,6 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
                 LinearLayoutManager.VERTICAL
             )
         )
-
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.giphyList
-                .onEach { newGiphy ->
-                    giphy.clear()
-                    giphy.addAll(newGiphy)
-                    adapter.notifyDataSetChanged()
-                }.launchIn(this)
-        }
     }
 
     private fun setupSearchView() {
@@ -66,8 +89,6 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
                 } else {
                     viewModel.fetchGiphy(query)
                 }
-//                Toast.makeText(activity, "No Language found..", Toast.LENGTH_LONG)
-//                    .show()
                 return false
             }
 

@@ -22,14 +22,22 @@ class AllGiphyViewModel @Inject constructor(
     private val _giphyList = MutableStateFlow<List<Giphy>>(listOf())
     val giphyList: StateFlow<List<Giphy>> = _giphyList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _showError = MutableStateFlow<String?>("")
+    val showError: StateFlow<String?> = _showError
+
     fun fetchTrendingGiphy() {
         viewModelScope.launch {
+            _isLoading.value = true
             giphyUseCases.getTrendingGiphyUseCase.invoke()
                 .flowOn(Dispatchers.IO)
                 .catch {
-                    val x = 0
+                    _isLoading.value = false
                 }
                 .collect { apiResult ->
+                    _isLoading.value = false
                     when (apiResult) {
                         is ApiResult.Success -> {
                             _giphyList.value = apiResult.data ?: emptyList()
@@ -42,17 +50,18 @@ class AllGiphyViewModel @Inject constructor(
 
     fun fetchGiphy(query: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             giphyUseCases.getGiphyUseCase.invoke(query)
                 .flowOn(Dispatchers.IO)
-                .catch {
-                    val x = 0
-                }
                 .collect { apiResult ->
+                    _isLoading.value = false
                     when (apiResult) {
                         is ApiResult.Success -> {
                             _giphyList.value = apiResult.data ?: emptyList()
                         }
-                        is ApiResult.Error -> {}
+                        is ApiResult.Error -> {
+                            _showError.value = apiResult.errorMessage
+                        }
                     }
                 }
         }
