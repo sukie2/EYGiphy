@@ -1,11 +1,12 @@
+package com.sukitha.ey.eygiphy.data.local
+
+import TestDispatcherRule
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import app.cash.turbine.test
-import com.sukitha.ey.eygiphy.data.local.GiphyDao
-import com.sukitha.ey.eygiphy.data.local.GiphyDatabase
 import com.sukitha.ey.eygiphy.domain.data.Giphy
 import junit.framework.Assert.assertFalse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
