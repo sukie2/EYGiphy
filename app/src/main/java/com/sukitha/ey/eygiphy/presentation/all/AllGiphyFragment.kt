@@ -8,7 +8,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sukitha.ey.eygiphy.R
@@ -16,6 +18,7 @@ import com.sukitha.ey.eygiphy.databinding.FragmentAllGiphyBinding
 import com.sukitha.ey.eygiphy.domain.data.Giphy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
@@ -24,7 +27,7 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
     private val viewModel by viewModels<AllGiphyViewModel>()
     private val giphy = mutableListOf<Giphy>()
     private lateinit var adapter: AllGiphyListAdapter
-    private val emptyListIndicator = MutableStateFlow<Boolean>(false)
+    private val emptyListIndicator = MutableStateFlow(false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,35 +37,53 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
         setupRecyclerView()
         observeState()
 
-        viewModel.fetchTrendingGiphy()
+        if(savedInstanceState == null){
+            viewModel.fetchTrendingGiphy()
+        }
     }
 
     private fun observeState() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.giphyList
-                .onEach { newGiphy ->
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.giphyList.collect { newGiphy ->
                     giphy.clear()
                     giphy.addAll(newGiphy)
                     adapter.notifyDataSetChanged()
                     emptyListIndicator.value = newGiphy.isEmpty()
-                }.launchIn(this)
-
-            viewModel.isLoading.onEach {
-                binding?.progressBar?.isVisible = it
-            }.launchIn(this)
-
-            emptyListIndicator.onEach {
-                binding?.emptyMessageTextView?.isVisible = it
-            }.launchIn(this)
-
-            viewModel.showError.onEach {
-                var message = it
-                if(message.isNullOrBlank()) {
-                    message = getString(R.string.generic_error_message)
                 }
-                Toast.makeText(activity, message, Toast.LENGTH_LONG)
-                    .show()
-            }.launchIn(this)
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isLoading.collect {
+                    binding?.progressBar?.isVisible = it
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                emptyListIndicator.collect {
+                    binding?.emptyMessageTextView?.isVisible = it
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.showError.collect {
+                    if (it.first != null) {
+                        var message = it.second
+                        if (message.isNullOrBlank()) {
+                            message = getString(R.string.generic_error_message)
+                        }
+                        Toast.makeText(activity, message, Toast.LENGTH_LONG)
+                            .show()
+                    }
+                }
+            }
         }
     }
 

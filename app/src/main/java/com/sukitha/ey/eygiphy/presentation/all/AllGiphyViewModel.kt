@@ -25,8 +25,8 @@ class AllGiphyViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _showError = MutableStateFlow<String?>("")
-    val showError: StateFlow<String?> = _showError
+    private val _showError = MutableStateFlow<Pair<String?, String?>>(Pair(null, null))
+    val showError: StateFlow<Pair<String?, String?>> = _showError
 
     fun fetchTrendingGiphy() {
         viewModelScope.launch {
@@ -60,7 +60,7 @@ class AllGiphyViewModel @Inject constructor(
                             _giphyList.value = apiResult.data ?: emptyList()
                         }
                         is ApiResult.Error -> {
-                            _showError.value = apiResult.errorMessage
+                            _showError.value = Pair("", apiResult.errorMessage)
                         }
                     }
                 }
