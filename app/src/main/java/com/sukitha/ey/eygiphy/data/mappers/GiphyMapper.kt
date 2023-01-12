@@ -9,7 +9,7 @@ fun GiphyResponse.toDomain(): List<Giphy> {
     giphyList?.forEach { giphyDto ->
         mutableGiphyList.add(
             Giphy(
-                id = giphyDto.id,
+                id = giphyDto.id ?: "",
                 title = giphyDto.title,
                 url = giphyDto.imageData?.original?.url
             )

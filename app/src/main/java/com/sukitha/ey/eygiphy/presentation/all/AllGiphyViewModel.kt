@@ -29,6 +29,10 @@ class AllGiphyViewModel @Inject constructor(
     private val _showError = MutableStateFlow<Pair<String?, String?>>(Pair(null, null))
     val showError: StateFlow<Pair<String?, String?>> = _showError
 
+    init {
+        getFavouriteGiphy()
+    }
+
     fun fetchTrendingGiphy() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -68,7 +72,7 @@ class AllGiphyViewModel @Inject constructor(
         }
     }
 
-    fun getFavouriteGiphy() {
+    private fun getFavouriteGiphy() {
         viewModelScope.launch {
             giphyUseCases.getFavouriteGiphy.invoke()
                 .flowOn(Dispatchers.IO)
@@ -82,6 +86,15 @@ class AllGiphyViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 giphyUseCases.insertGiphy.invoke(giphy)
+                getFavouriteGiphy()
+            }
+        }
+    }
+
+    fun removeGiphy(giphy: Giphy) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                giphyUseCases.removeFavouriteGiphy.invoke(giphy)
                 getFavouriteGiphy()
             }
         }

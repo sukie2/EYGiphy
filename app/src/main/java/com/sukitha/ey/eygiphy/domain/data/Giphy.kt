@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Giphy(
-    val id: String?,
+    @PrimaryKey val id: String,
     val url: String?,
     val title: String?,
-    val isFavourite: Boolean? = false,
-    @PrimaryKey val key: Int? = null
 )

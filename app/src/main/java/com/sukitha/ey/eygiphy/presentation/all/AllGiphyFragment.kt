@@ -26,6 +26,7 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
     private var binding: FragmentAllGiphyBinding? = null
     private val viewModel by viewModels<AllGiphyViewModel>()
     private val giphy = mutableListOf<Giphy>()
+    private val favourites = mutableListOf<Giphy>()
     private lateinit var adapter: AllGiphyListAdapter
     private val emptyListIndicator = MutableStateFlow(false)
 
@@ -37,7 +38,7 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
         setupRecyclerView()
         observeState()
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             viewModel.fetchTrendingGiphy()
         }
     }
@@ -51,6 +52,16 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
                     giphy.addAll(newGiphy)
                     adapter.notifyDataSetChanged()
                     emptyListIndicator.value = newGiphy.isEmpty()
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.favouriteGiphyList.collect { newGiphy ->
+                    favourites.clear()
+                    favourites.addAll(newGiphy)
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
@@ -88,8 +99,12 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
     }
 
     private fun setupRecyclerView() {
-        adapter = AllGiphyListAdapter(giphy) {
-            onFavouritesIconClick(it)
+        adapter = AllGiphyListAdapter(giphy, favourites) { it, isFavourite ->
+            if (isFavourite) {
+                viewModel.insertGiphy(it)
+            } else {
+                viewModel.removeGiphy(it)
+            }
         }
         binding?.giphyRecyclerView?.adapter = adapter
         binding?.giphyRecyclerView?.isNestedScrollingEnabled = false
