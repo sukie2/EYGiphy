@@ -4,10 +4,8 @@ import android.app.Application
 import androidx.room.Room
 import com.sukitha.ey.eygiphy.data.local.GiphyDatabase
 import com.sukitha.ey.eygiphy.data.remote.GiphyApi
-import com.sukitha.ey.eygiphy.data.repository.GiphyLocalRepositoryImpl
-import com.sukitha.ey.eygiphy.data.repository.GiphyRemoteRepositoryImpl
-import com.sukitha.ey.eygiphy.domain.repository.GiphyLocalRepository
-import com.sukitha.ey.eygiphy.domain.repository.GiphyRemoteRepository
+import com.sukitha.ey.eygiphy.data.repository.GiphyRepositoryImpl
+import com.sukitha.ey.eygiphy.domain.repository.GiphyRepository
 import com.sukitha.ey.eygiphy.domain.usecase.*
 import dagger.Module
 import dagger.Provides
@@ -19,20 +17,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object GiphyModule {
     @Provides
-    fun provideGiphyRemoteRepository(giphyApi: GiphyApi): GiphyRemoteRepository =
-        GiphyRemoteRepositoryImpl(giphyApi)
+    fun provideGiphyRemoteRepository(giphyApi: GiphyApi, db: GiphyDatabase): GiphyRepository =
+        GiphyRepositoryImpl(giphyApi, db.giphyDao)
 
     @Provides
     fun providesGiphyUseCase(
-        giphyRemoteRepository: GiphyRemoteRepository,
-        giphyLocalRepository: GiphyLocalRepository
+        giphyRepository: GiphyRepository
     ): GiphyUseCases {
         return GiphyUseCases(
-            getGiphyUseCase = GetGiphyUseCase(giphyRemoteRepository),
-            getTrendingGiphyUseCase = GetTrendingGiphyUseCase(giphyRemoteRepository),
-            insertGiphy = InsertGiphyUseCase(giphyLocalRepository),
-            getFavouriteGiphy = GetFavouriteGiphyUseCase(giphyLocalRepository),
-            removeFavouriteGiphy = RemoveFavouriteGiphy(giphyLocalRepository)
+            getGiphyUseCase = GetGiphyUseCase(giphyRepository),
+            getTrendingGiphyUseCase = GetTrendingGiphyUseCase(giphyRepository),
+            insertGiphy = InsertGiphyUseCase(giphyRepository),
+            getFavouriteGiphy = GetFavouriteGiphyUseCase(giphyRepository),
+            removeFavouriteGiphy = RemoveFavouriteGiphy(giphyRepository)
         )
     }
 
@@ -44,11 +41,5 @@ object GiphyModule {
             GiphyDatabase::class.java,
             GiphyDatabase.DATABASE_NAME
         ).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideGiphyRepository(db: GiphyDatabase): GiphyLocalRepository {
-        return GiphyLocalRepositoryImpl(db.giphyDao)
     }
 }
