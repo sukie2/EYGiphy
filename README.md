@@ -7,17 +7,17 @@
 - Infinite scrolling, pagination
 - Android Unit Tests
 
-## Tech stack
+## Tech stack and references
 - Kotlin
 - MVVM
 - Hilt
-- Coroutines
+- Coroutines 
 - Flow
-- Retrofit
-- Room
-- Glide
-- Turbine
-
+- Retrofit (Remote API handling https://square.github.io/retrofit/)
+- Room (Android Jetpack https://developer.android.com/jetpack)
+- Glide (Image loading and cache handling https://github.com/bumptech/glide)
+- Turbine (Flow testing - https://github.com/cashapp/turbine) 
+- Pagination (https://github.com/philipplackner/MVVMNewsApp/tree/Handling-pagination)
 
 https://user-images.githubusercontent.com/7973500/212183149-dc54e31c-d271-4d40-9a54-3dd692e8161f.mp4
 
