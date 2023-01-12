@@ -3,11 +3,11 @@ package com.sukitha.ey.eygiphy.di
 import android.app.Application
 import androidx.room.Room
 import com.sukitha.ey.eygiphy.data.local.GiphyDatabase
-import com.sukitha.ey.eygiphy.domain.repository.GiphyRemoteRepository
 import com.sukitha.ey.eygiphy.data.remote.GiphyApi
 import com.sukitha.ey.eygiphy.data.repository.GiphyLocalRepositoryImpl
 import com.sukitha.ey.eygiphy.data.repository.GiphyRemoteRepositoryImpl
 import com.sukitha.ey.eygiphy.domain.repository.GiphyLocalRepository
+import com.sukitha.ey.eygiphy.domain.repository.GiphyRemoteRepository
 import com.sukitha.ey.eygiphy.domain.usecase.*
 import dagger.Module
 import dagger.Provides

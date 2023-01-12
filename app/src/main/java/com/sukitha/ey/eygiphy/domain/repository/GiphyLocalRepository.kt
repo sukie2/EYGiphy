@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface GiphyLocalRepository {
     fun getGiphy(): Flow<List<Giphy>>
 
-    suspend fun insertGiphy(note: Giphy)
+    suspend fun insertGiphy(giphy: Giphy)
 
-    suspend fun deleteGiphy(note: Giphy)
+    suspend fun deleteGiphy(giphy: Giphy)
 }
