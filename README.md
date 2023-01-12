@@ -1,7 +1,8 @@
-# Giphy Rush (MVVM)
+# Giphy Rush
 
 ## Tech stack
 - Kotlin
+- MVVM
 - Hilt
 - Coroutines
 - Flow
