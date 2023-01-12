@@ -118,7 +118,7 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
     }
 
     private fun setupSearchView() {
-        binding!!.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding?.searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query.isNullOrBlank()) {
                     viewModel.fetchTrendingGiphy()
@@ -135,10 +135,6 @@ class AllGiphyFragment : Fragment(R.layout.fragment_all_giphy) {
                 return false
             }
         })
-    }
-
-    private fun onFavouritesIconClick(giphy: Giphy) {
-
     }
 
     override fun onDestroyView() {
