@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class GiphyRemoteRepositoryImpl(private val api: GiphyApi) : GiphyRemoteRepository {
-    override fun getTrendingGiphy(): Flow<ApiResult<List<Giphy>>> {
+    override fun getTrendingGiphy(offset: Int): Flow<ApiResult<List<Giphy>>> {
         return try {
             flow {
                 emit(ApiResult.Success(
-                    data = api.getTrendingGiphy().body()?.toDomain()
+                    data = api.getTrendingGiphy(offset = offset).body()?.toDomain()
                 ))
             }
         } catch (e: Exception) {
@@ -23,11 +23,11 @@ class GiphyRemoteRepositoryImpl(private val api: GiphyApi) : GiphyRemoteReposito
         }
     }
 
-    override fun getGiphy(query: String): Flow<ApiResult<List<Giphy>>> {
+    override fun getGiphy(query: String, offset: Int): Flow<ApiResult<List<Giphy>>> {
         return try {
             flow {
                 emit(ApiResult.Success(
-                    data = api.getGiphy(query = query).body()?.toDomain()
+                    data = api.getGiphy(query = query, offset = offset).body()?.toDomain()
                 ))
             }
         } catch (e: Exception) {

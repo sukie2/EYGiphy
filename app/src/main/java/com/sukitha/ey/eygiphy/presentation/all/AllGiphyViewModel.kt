@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.sukitha.ey.eygiphy.domain.data.Giphy
 import com.sukitha.ey.eygiphy.domain.usecase.GiphyUseCases
 import com.sukitha.ey.eygiphy.domain.util.ApiResult
+import com.sukitha.ey.eygiphy.util.ALL_GIPHY_PAGE_SIZE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
@@ -19,6 +20,8 @@ class AllGiphyViewModel @Inject constructor(
 
     private val _favouriteGiphyList = MutableStateFlow<List<Giphy>>(listOf())
     val favouriteGiphyList: StateFlow<List<Giphy>> = _favouriteGiphyList
+
+    var page = 1
 
     private val _giphyList = MutableStateFlow<List<Giphy>>(listOf())
     val giphyList: StateFlow<List<Giphy>> = _giphyList
@@ -36,7 +39,7 @@ class AllGiphyViewModel @Inject constructor(
     fun fetchTrendingGiphy() {
         viewModelScope.launch {
             _isLoading.value = true
-            giphyUseCases.getTrendingGiphyUseCase.invoke()
+            giphyUseCases.getTrendingGiphyUseCase.invoke((page * ALL_GIPHY_PAGE_SIZE) - 1)
                 .flowOn(Dispatchers.IO)
                 .catch {
                     _isLoading.value = false
@@ -45,7 +48,11 @@ class AllGiphyViewModel @Inject constructor(
                     _isLoading.value = false
                     when (apiResult) {
                         is ApiResult.Success -> {
-                            _giphyList.value = apiResult.data ?: emptyList()
+                            page++
+                            val combinedList = mutableListOf<Giphy>()
+                            combinedList.addAll(_giphyList.value)
+                            combinedList.addAll(apiResult.data ?: emptyList())
+                            _giphyList.value = combinedList.toList()
                         }
                         is ApiResult.Error -> {}
                     }
@@ -56,19 +63,23 @@ class AllGiphyViewModel @Inject constructor(
     fun fetchGiphy(query: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            giphyUseCases.getGiphyUseCase.invoke(query)
-                .flowOn(Dispatchers.IO)
-                .collect { apiResult ->
-                    _isLoading.value = false
-                    when (apiResult) {
-                        is ApiResult.Success -> {
-                            _giphyList.value = apiResult.data ?: emptyList()
-                        }
-                        is ApiResult.Error -> {
-                            _showError.value = Pair("", apiResult.errorMessage)
-                        }
+            giphyUseCases.getGiphyUseCase.invoke(query, (page * ALL_GIPHY_PAGE_SIZE) - 1)
+            .flowOn(Dispatchers.IO)
+            .collect { apiResult ->
+                _isLoading.value = false
+                when (apiResult) {
+                    is ApiResult.Success -> {
+                        page++
+                        val combinedList = mutableListOf<Giphy>()
+                        combinedList.addAll(_giphyList.value)
+                        combinedList.addAll(apiResult.data ?: emptyList())
+                        _giphyList.value = combinedList.toList()
+                    }
+                    is ApiResult.Error -> {
+                        _showError.value = Pair("", apiResult.errorMessage)
                     }
                 }
+            }
         }
     }
 
@@ -98,5 +109,10 @@ class AllGiphyViewModel @Inject constructor(
                 getFavouriteGiphy()
             }
         }
+    }
+
+    fun resetPaging() {
+        page = 1
+        _giphyList.value = mutableListOf()
     }
 }

@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -12,11 +14,22 @@ import com.sukitha.ey.eygiphy.R
 import com.sukitha.ey.eygiphy.domain.data.Giphy
 
 class AllGiphyListAdapter(
-    val data: List<Giphy>,
     private val favourites: List<Giphy>,
     val onClick: (Giphy, Boolean) -> Unit
 ) :
     RecyclerView.Adapter<AllGiphyListAdapter.GiphyViewHolder>() {
+
+    private val differCallback = object : DiffUtil.ItemCallback<Giphy>() {
+        override fun areItemsTheSame(oldItem: Giphy, newItem: Giphy): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Giphy, newItem: Giphy): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    val differ = AsyncListDiffer(this, differCallback)
 
     inner class GiphyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textView: TextView = itemView.findViewById(R.id.titleText)
@@ -31,20 +44,20 @@ class AllGiphyListAdapter(
     }
 
     override fun onBindViewHolder(holder: GiphyViewHolder, position: Int) {
-        holder.textView.text = data[position].title
+        holder.textView.text = differ.currentList[position].title
         holder.favImageView.setOnClickListener {
-            toggleFavourite(data[position])
+            toggleFavourite(differ.currentList[position])
         }
         Glide.with(holder.imageView.context)
             .asGif()
-            .load(data[position].url)
+            .load(differ.currentList[position].url)
             .placeholder(R.drawable.ic_baseline_gif_24)
             .override(250, 250)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(holder.imageView)
 
         var favIcon = R.drawable.ic_baseline_favorite_border_24
-        if (isFavourite(data[position])) {
+        if (isFavourite(differ.currentList[position])) {
             favIcon = R.drawable.ic_baseline_favorite_24
         }
         Glide.with(holder.favImageView.context)
@@ -68,6 +81,6 @@ class AllGiphyListAdapter(
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return differ.currentList.size
     }
 }
